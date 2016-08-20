@@ -1,3 +1,15 @@
+order_detail:
+    pattern:  /order/detail/{id}
+    defaults: { _controller: AcmeStoreBundle:Default:orderDetail }
+
+order_delete:
+    pattern:  /order/delete/{id}
+    defaults: { _controller: AcmeStoreBundle:Default:orderDelete }
+
+acme_store_orders:
+    path:     /store/orders
+    defaults: { _controller: AcmeStoreBundle:Default:orders }
+
 status:
     pattern:  /store/status
     defaults: { _controller: AcmeStoreBundle:Default:status }
@@ -27,9 +39,9 @@ addproduct:
     defaults: { _controller: AcmeStoreBundle:Default:addproduct }
 
 edit:
-    pattern:  /store/edit
+    pattern:  /store/edit/{id}
     defaults: { _controller: AcmeStoreBundle:Default:edit }
 
 delete:
-    pattern:  /store/delete
+    pattern:  /store/delete/{id}
     defaults: { _controller: AcmeStoreBundle:Default:delete }

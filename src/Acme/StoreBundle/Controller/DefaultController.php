@@ -59,8 +59,14 @@ class DefaultController extends Controller
         //with $offset and $limit to get items we wanted
         //$languages = $repository->getProductListWithPagination($order_by, $paginator->getOffset(), $paginator->getLimit());
         //Finally - return array to templating engine for displaying data.
-        
-    	$products = $this->get('doctrine')->getRepository('AcmeStoreBundle:Product')->findBy(array(), array('id' => 'DESC'));
+        $user = $this->container->get('security.context')->getToken()->getUser();
+        $userId = $user->getId();
+        $userName = $user->getUsername();
+        if($userName=='admin'){
+            $products = $this->get('doctrine')->getRepository('AcmeStoreBundle:Product')->findBy(array(), array('id' => 'DESC'));
+        }else{
+            $products = $this->get('doctrine')->getRepository('AcmeStoreBundle:Product')->findBy(array('userid'=>$userId), array('id' => 'DESC'));
+        }
     	 
         //$products = $repository->getProductListWithPagination($sort_direction, $paginator->getOffset(), $paginator->getLimit());
         //return array('products' => $products, 'sort_dir' => $sort_direction, 'paginator' => $strPaginator);
@@ -70,10 +76,24 @@ class DefaultController extends Controller
     public function addAction(Request $request)
     {
         $cateArray = array();
-        $category= $this->get('doctrine')->getRepository('AcmeCategoryBundle:Category')->findBy(array('status'=>1));
+//        $category= $this->get('doctrine')->getRepository('AcmeCategoryBundle:Category')->findBy(array('status'=>1));
+//        foreach($category as $key => $data):
+//            $cateArray[$data->getId()] = $data->getName();
+//        endforeach;
+        $user = $this->container->get('security.context')->getToken()->getUser();
+        $userId = $user->getId();
+        $userName = $user->getUsername();
+        if($userName=='admin'){
+            $category= $this->get('doctrine')->getRepository('AcmeCategoryBundle:Category')->findAll();
+        }else{
+            $category= $this->get('doctrine')->getRepository('AcmeCategoryBundle:Category')->findBy(array('userid'=>$userId));
+        }
         foreach($category as $key => $data):
             $cateArray[$data->getId()] = $data->getName();
         endforeach;
+        $queue = $cateArray;
+        array_unshift($queue, "select category");
+        $cate = $queue;
         $products = new \Acme\StoreBundle\Entity\Product();
         $products->setCategory('');
         $products->setName('');
@@ -82,6 +102,7 @@ class DefaultController extends Controller
         $products->setImage('');
         $form = $this->createFormBuilder($products)
             ->add('category', 'choice', array('choices' => array('placeholder'=>'select category',''=>$cateArray)))
+            //->add('category', 'choice', array('choices' => $cate,'data'=>$cateArray))
             ->add('name', 'text')
             ->add('price','text')
             ->add('description','textarea')
@@ -96,6 +117,7 @@ class DefaultController extends Controller
             $a = $request->request->get('form');
             $img = $form['image']->getData()->getClientOriginalName();
             $products = new Product();
+            $products->setUserid($request->get('userid'));
             $products->setName($a['name']);
             $products->setCategory($a['category']);
             $products->setPrice($a['price']);
@@ -115,11 +137,20 @@ class DefaultController extends Controller
     
     public function editAction(Request $request)
     {
-        $category= $this->get('doctrine')->getRepository('AcmeCategoryBundle:Category')->findAll();
+        $user = $this->container->get('security.context')->getToken()->getUser();
+        $userId = $user->getId();
+        $userName = $user->getUsername();
+        if($userName=='admin'){
+            $category= $this->get('doctrine')->getRepository('AcmeCategoryBundle:Category')->findAll();
+        }else{
+            $category= $this->get('doctrine')->getRepository('AcmeCategoryBundle:Category')->findBy(array('userid'=>$userId));
+        }
+        //$category= $this->get('doctrine')->getRepository('AcmeCategoryBundle:Category')->findAll();
         foreach($category as $key => $data):
             $cateArray[$data->getId()] = $data->getName();
         endforeach;
         $queue = $cateArray;
+        
         array_unshift($queue, "select category");
         $cate = $queue;
         
@@ -128,6 +159,7 @@ class DefaultController extends Controller
         $product = $em->getRepository('AcmeStoreBundle:Product')->find($id);
         
         $oldimg = $product->getImage();
+        
         $products = new \Acme\StoreBundle\Entity\Product();
         $products->setCategory('');
         $products->setName('');
@@ -136,7 +168,9 @@ class DefaultController extends Controller
         $products->setImage('');
         $form = $this->createFormBuilder($products)
             //->add('category', 'choice', array('choices' => array('placeholder'=>'select category',''=>$cateArray)))    
-            ->add('category', 'choice', array('choices' => $cate,'data'=>$product->getCategory()))    
+            //->add('category', 'choice', array('choices' => array('placeholder'=>'select category',''=>$cateArray)))    
+            //->add('category', 'choice', array('choices' => $cate,'data'=>$product->getCategory()))    
+            ->add('category', 'choice', array('choices' => $cateArray,'preferred_choices' => array($product->getCategory())))    
             ->add('name', 'text')
             ->add('price','text')
             ->add('description','textarea')
@@ -282,4 +316,38 @@ class DefaultController extends Controller
 		}	
 		return $this->redirect($this->generateUrl('acme_store'));	
 	}
+        
+        public function ordersAction(Request $request)
+        {
+            $user = $this->container->get('security.context')->getToken()->getUser();
+            $userId = $user->getId();
+            $userName = $user->getUsername();
+            if($userName=='admin'){
+                $em = $this->getDoctrine()->getManager();
+                $orders = $em->getRepository('AcmeHomeBundle:Cart')->findAll();
+                return $this->render('AcmeStoreBundle:Default:orders.html.twig',array('orders'=>$orders)); 
+            }else{
+                return $this->render('AcmeStoreBundle:Default:error.html.twig'); 
+            }
+        }
+        
+        public function orderDeleteAction(Request $request)
+	{
+		$id = $request->get('id');
+                $em = $this->getDoctrine()->getManager();
+                $order = $em->getRepository('AcmeHomeBundle:Cart')->find($id);
+                $em->remove($order);
+                $em->flush();
+                return $this->redirect($this->generateUrl('acme_store_orders'));
+	}
+        
+        public function orderDetailAction(Request $request)
+        {
+            $orderId = $request->get('id');
+            $em = $this->getDoctrine()->getManager();
+            $order = $em->getRepository('AcmeHomeBundle:Cart')->find($orderId);
+            $product = $em->getRepository('AcmeStoreBundle:Product')->find($order->getProductId());
+            $category = $em->getRepository('AcmeCategoryBundle:Category')->find($order->getCategoryId());
+            return $this->render('AcmeStoreBundle:Default:orderdetail.html.twig',array('order'=>$order,'productName'=>$product->getName(),'category'=>$category->getName()));
+        }
 }

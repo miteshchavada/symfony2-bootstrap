@@ -146,6 +146,5 @@ class Logo
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('logo', new NotBlank(array('message'=>'please enter your logo')));
-        $metadata->addPropertyConstraint('status', new NotBlank(array('message'=>'please check your logo')));
     }
 }

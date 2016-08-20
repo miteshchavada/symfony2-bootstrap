@@ -5,6 +5,11 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 
 class AppKernel extends Kernel
 {
+    public function __construct($environment, $debug)
+    {
+        date_default_timezone_set('Asia/Calcutta');
+        parent::__construct($environment, $debug);
+    }
     public function registerBundles()
     {
         $bundles = array(
@@ -25,6 +30,7 @@ class AppKernel extends Kernel
             new Stfalcon\Bundle\TinymceBundle\StfalconTinymceBundle(),
             new Acme\CategoryBundle\AcmeCategoryBundle(),
             new Acme\FooterBundle\AcmeFooterBundle(),
+            new Acme\TeamBundle\AcmeTeamBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

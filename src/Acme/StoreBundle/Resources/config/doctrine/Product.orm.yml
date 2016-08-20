@@ -8,6 +8,8 @@ Acme\StoreBundle\Entity\Product:
             id: true
             generator:
                 strategy: AUTO
+        userid:
+            type: integer
         name:
             type: string
             length: '100'

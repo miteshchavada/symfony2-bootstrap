@@ -4,6 +4,7 @@ namespace Acme\ImageBundle\Entity;
 
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -19,11 +20,17 @@ class Image
      */
     private $id;
 
+    private $title;
+    
+    private $link;
+    
+    private $description;
     /**
      * @var string
      */
     private $image;
 
+    private $backgroundimage;
     /**
      * @var \DateTime
      */
@@ -86,6 +93,73 @@ class Image
      * @param string $image
      * @return Image
      */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    
+        return $this;
+    }
+
+    /**
+     * Get image
+     *
+     * @return string 
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+    
+    /**
+     * Set image
+     *
+     * @param string $image
+     * @return Image
+     */
+    public function setLink($link)
+    {
+        $this->link = $link;
+    
+        return $this;
+    }
+
+    /**
+     * Get image
+     *
+     * @return string 
+     */
+    public function getLink()
+    {
+        return $this->link;
+    }
+    /**
+     * Set image
+     *
+     * @param string $image
+     * @return Image
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    
+        return $this;
+    }
+
+    /**
+     * Get image
+     *
+     * @return string 
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+    /**
+     * Set image
+     *
+     * @param string $image
+     * @return Image
+     */
     public function setImage($image)
     {
         $this->image = $image;
@@ -102,7 +176,28 @@ class Image
     {
         return $this->image;
     }
+    /**
+     * Set image
+     *
+     * @param string $image
+     * @return Image
+     */
+    public function setBackgroundimage($backgroundimage)
+    {
+        $this->backgroundimage = $backgroundimage;
+    
+        return $this;
+    }
 
+    /**
+     * Get image
+     *
+     * @return string 
+     */
+    public function getBackgroundimage()
+    {
+        return $this->backgroundimage;
+    }
     /**
      * Set createdAt
      *
@@ -150,7 +245,12 @@ class Image
     }
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
+        $metadata->addPropertyConstraint('title', new NotBlank(array('message'=>'please enter your title')));
+        $metadata->addPropertyConstraint('link', new NotBlank(array('message'=>'please enter your link')));
+        $metadata->addPropertyConstraint('link', new Assert\Url());
+        $metadata->addPropertyConstraint('description', new NotBlank(array('message'=>'please enter your description')));
         $metadata->addPropertyConstraint('image', new NotBlank(array('message'=>'please enter your image')));
+        $metadata->addPropertyConstraint('backgroundimage', new NotBlank(array('message'=>'please enter your background image')));
     }
     /**
      * @var \Acme\StoreBundle\Entity\Product

@@ -7,7 +7,7 @@ category_add:
     defaults: { _controller: AcmeCategoryBundle:Default:add }
 
 category_edit:
-    pattern:  /category/edit
+    pattern:  /category/edit/{id}
     defaults: { _controller: AcmeCategoryBundle:Default:edit }    
     
 category_status:
@@ -15,5 +15,5 @@ category_status:
     defaults: { _controller: AcmeCategoryBundle:Default:status }        
 
 category_delete:
-    pattern:  /category/delete
+    pattern:  /category/delete/{id}
     defaults: { _controller: AcmeCategoryBundle:Default:delete }            

@@ -1,11 +1,11 @@
 <?php
 
 namespace Acme\InfoBundle\Entity;
-
-use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Info
@@ -25,7 +25,7 @@ class Info
     /**
      * @var string
      */
-    private $description;
+    private $percentage;
 
     /**
      * @var \DateTime
@@ -80,9 +80,9 @@ class Info
      * @param string $description
      * @return Info
      */
-    public function setDescription($description)
+    public function setPercentage($percentage)
     {
-        $this->description = $description;
+        $this->percentage = $percentage;
 
         return $this;
     }
@@ -92,9 +92,9 @@ class Info
      *
      * @return string 
      */
-    public function getDescription()
+    public function getPercentage()
     {
-        return $this->description;
+        return $this->percentage;
     }
 
     /**
@@ -145,7 +145,7 @@ class Info
     
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('title', new NotBlank(array('message'=>'please enter title')));
-        $metadata->addPropertyConstraint('description', new NotBlank(array('message'=>'please enter description')));
+        $metadata->addPropertyConstraint('title', new NotBlank(array('message'=>'please enter your title')));
+        $metadata->addPropertyConstraint('percentage', new Assert\GreaterThan(0,array('message'=>'Please Select Percentage')));
     }
 }

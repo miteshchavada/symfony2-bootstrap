@@ -72,12 +72,6 @@ fos_user:
     db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
     firewall_name: main
     user_class: Acme\UserBundle\Entity\User
-    registration:
-        confirmation:
-            enabled: true
-    from_email:
-        address:        employee.svipl@gmail.com
-        sender_name:    Demo App        
 
 stfalcon_tinymce:
     include_jquery: true

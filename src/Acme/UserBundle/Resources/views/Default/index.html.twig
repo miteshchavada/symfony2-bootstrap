@@ -31,6 +31,12 @@
                             Users List
                         </div>
                     </div>
+   		    {% for flashMessage in app.session.flashbag.get('success') %}
+		    <div class="alert alert-success" id="success">	
+			<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+			    {{ flashMessage }}
+                    </div>					
+		    {% endfor %}	
                     {% for flashMessage in app.session.flashbag.get('notice') %}
                         <div class="alert alert-danger"> 
                             {{ flashMessage }}
@@ -54,7 +60,6 @@
                                             <td>{{ user.username }}</td>
                                             <td>{{ user.email }}</td>
                                             <td>
-						<a href="{{ path('acme_user_edit', { 'id' : user.id } ) }}" class="btn btn-primary">Edit</a>
         					<a href="{{ path('acme_user_delete', { 'id' : user.id } ) }}" onclick="return confirm('are sure delete?')" class="btn btn-danger">Delete</a>
                                                 {% if is_granted('ROLE_ADMIN') %}
                                                     {% if(user.enabled == '1') %}

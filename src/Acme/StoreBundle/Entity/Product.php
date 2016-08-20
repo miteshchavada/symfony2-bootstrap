@@ -22,6 +22,8 @@ class Product
     /**
      * @var string
      */
+    private $userid;
+    
     private $name;
 
     /**
@@ -112,6 +114,28 @@ class Product
         return $this->id;
     }
 
+    /**
+     * Set name
+     *
+     * @param string $name
+     * @return Product
+     */
+    public function setUserid($userid)
+    {
+        $this->userid = $userid;
+    
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string 
+     */
+    public function getUserid()
+    {
+        return $this->userid;
+    }
     /**
      * Set name
      *
@@ -248,6 +272,7 @@ class Product
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new NotBlank(array('message'=>'please enter your name')));
+        $metadata->addPropertyConstraint('category', new Assert\GreaterThan(0,array('message'=>'Please Select Category')));
         $metadata->addPropertyConstraint('price', new NotBlank(array('message'=>'please enter your price')));
 	$metadata->addPropertyConstraint('description', new NotBlank(array('message'=>'please enter your description')));
         $metadata->addPropertyConstraint('image', new NotBlank(array('message'=> 'please enter your image')));

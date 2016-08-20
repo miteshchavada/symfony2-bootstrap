@@ -52,7 +52,7 @@
                 {% endif %}    
             </div>
             <!-- /.navbar-header -->
-
+            
             <ul class="nav navbar-top-links navbar-right">
                 <!-- /.dropdown -->
                 <li class="dropdown">
@@ -82,17 +82,23 @@
                         {% if is_granted('ROLE_ADMIN') %}
                             <li><a href="{{ path('acme_user') }}"><i class="fa fa-user fa-fw"></i>User</a></li>
                             <li><a href="{{ path('acme_info_logo') }}"><i class="fa fa-dashboard fa-fw"></i>Logo</a></li>
+                            <li><a href="{{ path('acme_image') }}"><i class="fa fa-table fa-fw"></i>Slider</a></li>
+                            <li><a href="{{ path('acme_info_ourservice') }}"><i class="fa fa-edit fa-fw"></i>Features</a></li>
+                            <li><a href="{{ path('acme_info_serviceslist') }}"><i class="fa fa-envelope fa-fw"></i>Recent Works</a></li>
+                            <li><a href="{{ path('acme_info') }}"><i class="fa fa-sitemap fa-fw"></i>Our Skills</a></li>
+                            <li><a href="{{ path('acme_info_people') }}"><i class="fa fa-envelope fa-fw"></i>Why people like us</a></li>
+                            <li><a href="{{ path('acme_info_work') }}"><i class="fa fa-envelope fa-fw"></i>Work</a></li>
+                            <li><a href="{{ path('acme_info_testimonials') }}"><i class="fa fa-wrench fa-fw"></i>Testimonials</a></li>
+                            <li><a href="{{ path('acme_team') }}"><i class="fa fa-wrench fa-fw"></i>Team</a></li>
                         {% endif %}    
                         <li><a href="{{ path('acme_category') }}"><i class="fa fa-dashboard fa-fw"></i>Category</a></li>
                         <li><a href="{{ path('acme_store') }}"><i class="fa fa-dashboard fa-fw"></i>Store</a></li>
-                        <li><a href="{{ path('acme_image') }}"><i class="fa fa-table fa-fw"></i>Slider Image</a></li>
-                        <li><a href="{{ path('acme_info') }}"><i class="fa fa-sitemap fa-fw"></i>Info</a></li>
-                        <li><a href="{{ path('acme_info_welcome') }}"><i class="fa fa-edit fa-fw"></i>Front</a></li>
-                        <li><a href="{{ path('acme_info_testimonials') }}"><i class="fa fa-wrench fa-fw"></i>Testimonials</a></li> 	
+                        {% if is_granted('ROLE_ADMIN') %} 	
                         <li><a href="{{ path('acme_info_newslist') }}"><i class="fa fa-files-o fa-fw"></i>News</a></li>
-                        <li><a href="{{ path('acme_info_serviceslist') }}"><i class="fa fa-envelope fa-fw"></i>Services</a></li>
                         <li><a href="{{ path('acme_info_contactus') }}"><i class="fa fa-bell fa-fw"></i>ContactUs</a></li>
                         <li><a href="{{ path('acme_footer') }}"><i class="fa fa-bell fa-fw"></i>Footer</a></li>
+                        <li><a href="{{ path('acme_store_orders') }}"><i class="fa fa-wrench fa-fw"></i>Orders</a></li>
+                        {% endif %}    
                     </ul>
                 </div>
             </div>
@@ -116,6 +122,10 @@
     <!-- DataTables JavaScript -->
     <script src="{{ asset('bundles/acmeuser/js/plugins/dataTables/jquery.dataTables.js') }}"></script>
     <script src="{{ asset('bundles/acmeuser/js/plugins/dataTables/dataTables.bootstrap.js') }}"></script>
+    <script src="{{ asset('bundles/acmeuser/js/jquery.validate.js') }}"></script>
+    <script src="{{ asset('bundles/acmeuser/js/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('bundles/acmeuser/js/common.js') }}"></script>
+    
     <script>
         var oTable;
         $(document).ready(function () {
@@ -142,6 +152,7 @@
                         }else{
                             $("a#"+result.id).removeClass("btn-success").addClass("btn-danger").html("Disabled");;
                         }
+			window.location.reload();
                     },
                     error: function(e){
                         alert(e);
@@ -165,8 +176,9 @@
                         if(result.status == true){
                             $("a#"+result.id).removeClass("btn-danger").addClass("btn-success").html("Enable");
                         }else{
-                            $("a#"+result.id).removeClass("btn-success").addClass("btn-danger").html("Disabled");;
+                            $("a#"+result.id).removeClass("btn-success").addClass("btn-danger").html("Disabled");
                         }
+			window.location.reload();
                     },
                     error: function(e){
                         alert(e);
@@ -188,11 +200,15 @@
                     },
                     success: function(result){
                         //oTable.fnDraw();
+                        if(result == 1){
+                            $("#error").show();
+                        }
                         if(result.status == true){
                             $("a#"+result.id).removeClass("btn-danger").addClass("btn-success").html("Enable");
                         }else{
                             $("a#"+result.id).removeClass("btn-success").addClass("btn-danger").html("Disabled");;
                         }
+			window.location.reload();
                     },
                     error: function(e){
                         alert(e);
@@ -215,7 +231,8 @@
                             $("a#"+result.id).removeClass("btn-danger").addClass("btn-success").html("Enable");
                         }else{
                             $("a#"+result.id).removeClass("btn-success").addClass("btn-danger").html("Disabled");;
-                        }
+                        }	
+			window.location.reload();
                     },
                     error: function(e){
                         alert(e);

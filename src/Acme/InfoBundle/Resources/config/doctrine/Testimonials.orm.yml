@@ -17,6 +17,9 @@ Acme\InfoBundle\Entity\Testimonials:
             length: 255
         description:
             type: text
+        image:
+            type: string
+            length: 255    
         createdAt:
             type: datetime
         updatedAt:

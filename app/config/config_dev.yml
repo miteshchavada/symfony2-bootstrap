@@ -32,7 +32,5 @@ monolog:
 assetic:
     use_controller: "%use_assetic_controller%"
 
-swiftmailer:
-    transport: gmail
-    username:  employee.svipl@gmail.com
-    password:  emp$vipl1
+#swiftmailer:
+#    delivery_address: me@example.com

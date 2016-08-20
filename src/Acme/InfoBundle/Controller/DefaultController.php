@@ -16,7 +16,7 @@ use Acme\InfoBundle\Entity\Testimonials;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File;
-
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class DefaultController extends Controller
 {
@@ -27,12 +27,19 @@ class DefaultController extends Controller
     }
     public function addAction(Request $request)
     {
+        $info = $this->get('doctrine')->getRepository('AcmeInfoBundle:Info')->findAll();
+        $count = count($info);
+        $a = 0; $b=100; $c=array();
+        for($a;$a<=$b;$a++)
+        {
+            $c[] = $a;
+        }
         $info = new \Acme\InfoBundle\Entity\Info();
         $info->setTitle('');
-        $info->setDescription('');
+        $info->setPercentage('');
         $form = $this->createFormBuilder($info)
             ->add('title', 'text')
-            ->add('description', 'textarea')
+            ->add('percentage', 'choice', array('choices' => array('placeholder'=>'select percentage',''=>$c)))
             ->getForm();
         $form->handleRequest($request);
         $validator = $this->get('validator');
@@ -42,13 +49,17 @@ class DefaultController extends Controller
         }else{
             if($request->isMethod('post')=='add')
             {
+                if($count >= 10){
+                    return $this->render('AcmeInfoBundle:Default:add.html.twig', array('form' => $form->createView()));
+                }
                 $em = $this->getDoctrine()->getManager();
                 $a = $request->request->get('form');
                 $info = new \Acme\InfoBundle\Entity\Info();
                 $info->setTitle($a['title']);
-                $info->setDescription($a['description']);
+                $info->setPercentage($a['percentage']);
                 $em->persist($info);
                 $em->flush();
+		$this->get('session')->getFlashBag()->set('success', 'Info Add Successfully');
                 return $this->redirect($this->generateUrl('acme_info'));
             }
         }
@@ -58,15 +69,20 @@ class DefaultController extends Controller
     }
     public function editAction(Request $request)
     {
+        $a = 0; $b=100; $c=array();
+        for($a;$a<=$b;$a++)
+        {
+            $c[] = $a;
+        }
         $id = $request->get('id');
         $em = $this->getDoctrine()->getManager();
         $inform = $em->getRepository('AcmeInfoBundle:Info')->find($id);
         $info = new \Acme\InfoBundle\Entity\Info();
         $info->setTitle($inform->getTitle());
-        $info->setDescription($inform->getDescription());
+        $info->setPercentage($inform->getPercentage());
         $form = $this->createFormBuilder($info)
             ->add('title', 'text')
-            ->add('description', 'textarea')
+            ->add('percentage', 'choice', array('choices' => array('placeholder'=>'select percentage',''=>$c)))
             ->getForm();
         $form->handleRequest($request);
         $validator = $this->get('validator');
@@ -79,9 +95,10 @@ class DefaultController extends Controller
                 $a = $request->request->get('form');
                 $info = $em->getRepository('AcmeInfoBundle:Info')->find($id);
                 $info->setTitle($a['title']);
-                $info->setDescription($a['description']);
+                $info->setPercentage($a['percentage']);
                 $em->persist($info);
                 $em->flush();
+		$this->get('session')->getFlashBag()->set('success', 'Info Update Successfully');
                 return $this->redirect($this->generateUrl('acme_info'));
             }
         }
@@ -94,9 +111,10 @@ class DefaultController extends Controller
         $info = $em->getRepository('AcmeInfoBundle:Info')->find($id);
         $em->remove($info);
         $em->flush();
+	$this->get('session')->getFlashBag()->set('notice', 'Your Record Delete Successfully');
         return $this->redirect($this->generateUrl('acme_info'));
     }
-    public function welcomeAction(Request $request)
+    public function ourserviceAction(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
         $all = $this->get('doctrine')->getRepository('AcmeInfoBundle:Front')->findAll();
@@ -108,9 +126,10 @@ class DefaultController extends Controller
                 $front->setDescription($request->get('description'));
                 $em->persist($front);
                 $em->flush();
-		return $this->render('AcmeInfoBundle:Default:welcome.html.twig', array('front' => $front));
+		$this->get('session')->getFlashBag()->set('notice', 'Features Update Successfully');		
+		return $this->render('AcmeInfoBundle:Default:ourservice.html.twig', array('front' => $front));
 	}
-	return $this->render('AcmeInfoBundle:Default:welcome.html.twig', array('front' => $front));
+	return $this->render('AcmeInfoBundle:Default:ourservice.html.twig', array('front' => $front));
     }
 
     public function contactusAction(Request $request)
@@ -124,6 +143,7 @@ class DefaultController extends Controller
                 $contactus->setDescription($request->get('description'));
                 $em->persist($contactus);
                 $em->flush();
+		$this->get('session')->getFlashBag()->set('notice', 'ContactUs Update Successfully');
 		return $this->render('AcmeInfoBundle:Default:contactus.html.twig', array('contactus' => $contactus));
 	}
 	return $this->render('AcmeInfoBundle:Default:contactus.html.twig', array('contactus' => $contactus));
@@ -147,11 +167,12 @@ class DefaultController extends Controller
         $testi->setName('');
         $testi->setPost('');
 	$testi->setDescription('');
-
-        $form = $this->createFormBuilder($testi,array('action'=>'/app_dev.php/info/testimonials'))
+        $testi->setImage('');
+        $form = $this->createFormBuilder($testi)
             ->add('name', 'text')
             ->add('post', 'text')
 	    ->add('description', 'textarea')	
+            ->add('image', 'file')	    
 	    ->add('save', 'submit', array('label' => 'Save'))	
             ->getForm();
 	$form->handleRequest($request);
@@ -162,14 +183,21 @@ class DefaultController extends Controller
         }else{
             if($request->isMethod('post') == 'save')
             {	
+                $a = $request->request->get('form');
+                $img = $form['image']->getData()->getClientOriginalName();
 		$em = $this->getDoctrine()->getManager();
 		$a = $request->request->get('form');
                 $testimonial = new \Acme\InfoBundle\Entity\Testimonials();
                 $testimonial->setName($a['name']);
 		$testimonial->setPost($a['post']);
 		$testimonial->setDescription($a['description']);
+                $testimonial->setImage($img);
                 $em->persist($testimonial);
                 $em->flush();
+                $dir = $_SERVER['DOCUMENT_ROOT'].'/uploads/testimonials/'.$testimonial->getId();
+                mkdir($dir);
+                $form->get('image')->getData()->move($dir,$img);
+		$this->get('session')->getFlashBag()->set('notice', 'Your Record Add Successfully');
                 return $this->redirect($this->generateUrl('acme_info_testimonials'));
 	    }
 	}
@@ -183,6 +211,11 @@ class DefaultController extends Controller
         $info = $em->getRepository('AcmeInfoBundle:Testimonials')->find($id);
         $em->remove($info);
         $em->flush();
+        if(is_file($_SERVER['DOCUMENT_ROOT'].'/uploads/testimonials/'.$id.'/'.$info->getImage())){
+        	unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/testimonials/'.$id.'/'.$info->getImage());
+                rmdir($_SERVER['DOCUMENT_ROOT'].'/uploads/testimonials/'.$id);
+        }
+	$this->get('session')->getFlashBag()->set('notice', 'Your Record Delete Successfully');
         return $this->redirect($this->generateUrl('acme_info_testimonials'));	
     }
 
@@ -191,23 +224,38 @@ class DefaultController extends Controller
 	$id = $request->get('id');
 	$em = $this->getDoctrine()->getManager();
         $testimonials = $em->getRepository('AcmeInfoBundle:Testimonials')->find($id);
+        $oldimg = $testimonials->getImage();
         $testimonial = new \Acme\InfoBundle\Entity\Testimonials();
         $testimonial->setName($testimonials->getName());
         $testimonial->setPost($testimonials->getPost());
 	$testimonial->setDescription($testimonials->getDescription());
-        $form = $this->createFormBuilder($testimonials)
+        $form = $this->createFormBuilder($testimonial)
             ->add('name', 'text')
 	    ->add('post', 'text')
             ->add('description', 'textarea')
+            ->add('image','file', array('error_bubbling' => TRUE,'required'=>false))    
             ->getForm();
         $form->handleRequest($request);
         $validator = $this->get('validator');
         $errors = $validator->validate($form);
-         if (count($errors) > 0) {
+         if (count($errors) > 1) {
             //echo "invalid";
         }else{
             if($request->isMethod('post')=='edit')
             {
+                if($_FILES['form']['name']['image'])
+                {
+                        $testi = $em->getRepository('AcmeInfoBundle:Testimonials')->find($id);
+                        unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/testimonials/'.$testi->getId().'/'.$oldimg);
+                        $newimg = $form['image']->getData()->getClientOriginalName();
+                        $testi->setImage($newimg);
+                        $em->persist($testi);
+                        $em->flush();
+                        $img = $form['image']->getData()->getClientOriginalName();
+                        $dir = $_SERVER['DOCUMENT_ROOT'].'/uploads/testimonials/'.$testi->getId().'/';
+                        $form->get('image')->getData()->move($dir,$img);
+                        return $this->redirect($this->generateUrl('acme_info_testimonials'));
+                }else{
                 $a = $request->request->get('form');
                 $info = $em->getRepository('AcmeInfoBundle:Testimonials')->find($id);
                 $info->setName($a['name']);
@@ -215,10 +263,12 @@ class DefaultController extends Controller
                 $info->setDescription($a['description']);
                 $em->persist($info);
                 $em->flush();
+		$this->get('session')->getFlashBag()->set('success', 'Your Record Update Successfully');
                 return $this->redirect($this->generateUrl('acme_info_testimonials'));
+                }
             }
         }    
-        return $this->render('AcmeInfoBundle:Default:testiedit.html.twig', array('form' => $form->createView(),'id'=>$id));
+        return $this->render('AcmeInfoBundle:Default:testiedit.html.twig', array('form' => $form->createView(),'id'=>$id,'image'=>$oldimg));
     }
     
     public function logoAction(Request $request)
@@ -242,7 +292,6 @@ class DefaultController extends Controller
         $image->setLogo('');
         $form = $this->createFormBuilder($image)
                 ->add('logo','file')
-                ->add('status','checkbox')
                 ->getForm();
         $form->handleRequest($request);
         $validator = $this->get('validator');
@@ -259,11 +308,12 @@ class DefaultController extends Controller
                $og_image = rand().'_'.$form['logo']->getData()->getClientOriginalName();
                $image = new \Acme\InfoBundle\Entity\Logo();
                $image->setLogo($og_image);
-               $image->setStatus($a['status']);
+               $image->setStatus(0);
                $em = $this->getDoctrine()->getManager();
                $em->persist($image);
                $em->flush();
                $form->get('logo')->getData()->move($dir,$og_image);
+	       $this->get('session')->getFlashBag()->set('success', 'Your Logo Add Successfully');	
                return $this->redirect($this->generateUrl('acme_info_logo'));
                }
         }
@@ -275,20 +325,30 @@ class DefaultController extends Controller
             $id = $request->get('id');
             $em = $this->getDoctrine()->getManager();
             $logoStatus = $em->getRepository('AcmeInfoBundle:Logo')->find($id);
+            $logo = $em->getRepository('AcmeInfoBundle:Logo')->findByStatus(1);
             $stat = $logoStatus->getStatus();
             if($stat == '1')
             {
+		    $status = "Disable";
                     $em = $this->getDoctrine()->getManager();
                     $logo = $em->getRepository('AcmeInfoBundle:Logo')->find($id);
                     $logo->setStatus('0');
                     $em->flush();
+		    $this->get('session')->getFlashBag()->set('success', 'Your Logo Status '.$status.' Successfully');
             }
             else
             {
-                    $em = $this->getDoctrine()->getManager();
-                    $logo = $em->getRepository('AcmeInfoBundle:Logo')->find($id);
-                    $logo->setStatus('1');
-                    $em->flush();
+		    $status = "Enable";
+                    if(!count($logo)>=1){
+                        $em = $this->getDoctrine()->getManager();
+                        $logo = $em->getRepository('AcmeInfoBundle:Logo')->find($id);
+                        $logo->setStatus('1');
+                        $em->flush();
+			$this->get('session')->getFlashBag()->set('success', 'Your Logo Status '.$status.' Successfully');
+                    }else{
+                        return new Response("1");
+                    }
+                    
             }
             //echo "true";
             $response = array("code" => 100, "success" => true, "status" => $logoStatus->getStatus(), "id" => $logoStatus->getId());
@@ -303,10 +363,8 @@ class DefaultController extends Controller
         $imageo = $em->getRepository('AcmeInfoBundle:Logo')->find($id);
         $image = new \Acme\InfoBundle\Entity\Logo();
         $image->setLogo('');
-        $image->setStatus('');
         $form = $this->createFormBuilder($image)
                 ->add('logo','file')
-                ->add('status','checkbox',array('mapped'=>false,'required'=>false,'error_bubbling'=>true,'data' => $imageo->getStatus()==1 ? TRUE : FALSE))
                 ->getForm();
         $form->handleRequest($request);
         $validator = $this->get('validator');
@@ -337,8 +395,10 @@ class DefaultController extends Controller
                     }
                     $em->flush();
                     $form->get('logo')->getData()->move($dir,$new_image);
+		    $this->get('session')->getFlashBag()->set('success', 'Your Logo Update Successfully');	
                     return $this->redirect($this->generateUrl('acme_info_logo'));
-                }else{
+                }else{	
+		    $this->get('session')->getFlashBag()->set('success', 'Your Logo Update Successfully');	
                     return $this->redirect($this->generateUrl('acme_info_logo'));
                 }
             }
@@ -354,6 +414,7 @@ class DefaultController extends Controller
         $em->remove($image);
         $em->flush();
         unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/logo/'.$image->getLogo());
+	$this->get('session')->getFlashBag()->add('notice','Logo Delete Successfully !');
         return $this->redirect($this->generateUrl('acme_info_logo'));
     }
 }

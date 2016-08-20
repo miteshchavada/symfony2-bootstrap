@@ -36,8 +36,8 @@
                                             <td><img src="{{asset(['uploads/news/',product.id,'/',product.image]|join)}}" style="width:80px; height: 50px;" /></td>
                                             <td width="250px;">{{ product.description }}</td>
                                             <td>
-						<a href="news/edit?id={{ product.id }}" class="btn btn-primary">edit</a>
-        					<a href="news/delete?id={{ product.id }}" class="btn btn-danger" onclick="return confirm('are sure delete?')">delete</a></li>
+						<a href="{{ path('acme_news_edit',{ 'id':product.id } ) }}" class="btn btn-primary">edit</a>
+        					<a href="{{ path('acme_news_delete',{ 'id':product.id } ) }}" class="btn btn-danger" onclick="return confirm('are sure delete?')">delete</a></li>
 					    </td>
                                         </tr>
 					{% endfor %}

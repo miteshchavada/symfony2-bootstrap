@@ -31,7 +31,11 @@ class Testimonials
      * @var string
      */
     private $description;
-
+    
+    /**
+     * @var string
+     */
+    private $image;
     /**
      * @var \DateTime
      */
@@ -132,7 +136,29 @@ class Testimonials
     {
         return $this->description;
     }
+    
+    /**
+     * Set image
+     *
+     * @param string $image
+     * @return Work
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
 
+        return $this;
+    }
+
+    /**
+     * Get image
+     *
+     * @return string 
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
     /**
      * Set createdAt
      *
@@ -183,7 +209,7 @@ class Testimonials
         $metadata->addPropertyConstraint('name', new NotBlank(array('message'=>'please enter your name')));
         $metadata->addPropertyConstraint('post', new NotBlank(array('message'=>'please enter your post')));
 	$metadata->addPropertyConstraint('description', new NotBlank(array('message'=>'please enter your description')));
-        //$metadata->addPropertyConstraint('image', new NotBlank(array('message'=> 'please enter your image')));
+        $metadata->addPropertyConstraint('image', new NotBlank(array('message'=> 'please enter your image')));
     }
     private function getParamsFromRequest() {
     //If current page number is set in URL

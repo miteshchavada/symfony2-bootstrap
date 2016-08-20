@@ -12,8 +12,9 @@ Acme\InfoBundle\Entity\Info:
         title:
             type: string
             length: 255
-        description:
-            type: text
+        percentage:
+            type: string
+            length: 255
         createdAt:
             type: datetime
         updatedAt:

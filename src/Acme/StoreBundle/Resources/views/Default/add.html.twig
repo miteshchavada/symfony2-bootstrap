@@ -9,8 +9,10 @@
         <div class="row">  
             <center>
                 <form action="{{ path('add') }}" method="post" {{ form_enctype(form) }} class="form-group">
+                    <input type="hidden" value="{{ app.user.id }}" name="userid">
                     {% if not form.vars.valid %}
                         <div class="alert alert-danger"> 
+                            {{ form_errors(form.category)}}
                             {{ form_errors(form.name)}}
                             {{ form_errors(form.price) }}
                             {{ form_errors(form.description) }}

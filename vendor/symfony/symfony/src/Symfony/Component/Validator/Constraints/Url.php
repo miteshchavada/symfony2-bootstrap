@@ -23,6 +23,6 @@ use Symfony\Component\Validator\Constraint;
  */
 class Url extends Constraint
 {
-    public $message = 'This value is not a valid URL.';
+    public $message = 'Url Link Not Valid';
     public $protocols = array('http', 'https');
 }

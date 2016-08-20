@@ -12,6 +12,12 @@ $metadata->mapField(array(
    'columnName' => 'id',
   ));
 $metadata->mapField(array(
+   'columnName' => 'category',
+   'fieldName' => 'category',
+   'type' => 'string',
+   'length' => '255',
+  ));
+$metadata->mapField(array(
    'columnName' => 'name',
    'fieldName' => 'name',
    'type' => 'string',

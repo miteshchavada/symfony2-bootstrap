@@ -20,6 +20,7 @@ class Category
     /**
      * @var string
      */
+    private $userid;
     private $name;
 
     /**
@@ -52,6 +53,17 @@ class Category
         return $this->id;
     }
 
+    public function setUserid($userid)
+    {
+        $this->userid = $userid;
+
+        return $this;
+    }
+    
+    public function getUserid()
+    {
+        return $this->userid;
+    }
     /**
      * Set name
      *

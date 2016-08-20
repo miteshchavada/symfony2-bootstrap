@@ -49,7 +49,7 @@ class ServiceslistController extends Controller
 				$em = $this->getDoctrine()->getManager();
 				$em->persist($services);
 				$em->flush();
-                                $dir = $_SERVER['DOCUMENT_ROOT'].'/uploads/services/'.$services->getId();
+                                $dir = $_SERVER['DOCUMENT_ROOT'].'/uploads/recent_works/'.$services->getId();
                                 mkdir($dir);
                                 $form->get('image')->getData()->move($dir,$img);
 				return $this->redirect($this->generateUrl('acme_info_serviceslist'));
@@ -69,7 +69,7 @@ class ServiceslistController extends Controller
             $form = $this->createFormBuilder($services)
 		        ->add('title', 'text')
 		        ->add('description','textarea')
-                        ->add('image','file', array('error_bubbling' => TRUE))
+                        ->add('image','file', array('error_bubbling' => TRUE,'required'=>false))
 		        ->getForm();
             $form->handleRequest($request);
             $validator = $this->get('validator');
@@ -82,13 +82,13 @@ class ServiceslistController extends Controller
                     if($_FILES['form']['name']['image'])
                     {
                             $serv = $em->getRepository('AcmeInfoBundle:Services')->find($id);
-                            unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/services/'.$serv->getId().'/'.$oldimg);
+                            unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/recent_works/'.$serv->getId().'/'.$oldimg);
                             $newimg = $form['image']->getData()->getClientOriginalName();
                             $serv->setImage($newimg);
                             $em->persist($serv);
                             $em->flush();
                             $img = $form['image']->getData()->getClientOriginalName();
-                            $dir = $_SERVER['DOCUMENT_ROOT'].'/uploads/services/'.$serv->getId().'/';
+                            $dir = $_SERVER['DOCUMENT_ROOT'].'/uploads/recent_works/'.$serv->getId().'/';
                             $form->get('image')->getData()->move($dir,$img);
                             return $this->redirect($this->generateUrl('acme_info_serviceslist'));
                     }
@@ -114,9 +114,9 @@ class ServiceslistController extends Controller
         $services = $em->getRepository('AcmeInfoBundle:Services')->find($id);
         $em->remove($services);
         $em->flush();
-        if(is_file($_SERVER['DOCUMENT_ROOT'].'/uploads/services/'.$id.'/'.$services->getImage())){
-        	unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/services/'.$id.'/'.$services->getImage());
-                rmdir($_SERVER['DOCUMENT_ROOT'].'/uploads/services/'.$id);
+        if(is_file($_SERVER['DOCUMENT_ROOT'].'/uploads/recent_works/'.$id.'/'.$services->getImage())){
+        	unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/recent_works/'.$id.'/'.$services->getImage());
+                rmdir($_SERVER['DOCUMENT_ROOT'].'/uploads/recent_works/'.$id);
         }
         return $this->redirect($this->generateUrl('acme_info_serviceslist'));
     }

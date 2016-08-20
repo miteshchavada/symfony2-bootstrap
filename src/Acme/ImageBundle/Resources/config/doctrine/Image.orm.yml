@@ -9,9 +9,20 @@ Acme\ImageBundle\Entity\Image:
             generator:
                 strategy: AUTO
     fields:
+        title:
+            type: string
+            length: 255
+        link:
+            type: string
+            length: 255
+        description:
+            type: text    
         image:
             type: string
             length: 255
+        backgroundimage:
+            type: string
+            length: 255    
         createdAt:
             type: datetime
         updatedAt:

@@ -1,9 +1,9 @@
 acme_user_edit:
-    pattern:  /edit
+    pattern:  /edit/{id}
     defaults: { _controller: AcmeUserBundle:Default:edit }
 
 acme_user_delete:
-    pattern:  /delete
+    pattern:  /delete/{id}
     defaults: { _controller: AcmeUserBundle:Default:delete }
 
 acme_user_status:
